@@ -1,0 +1,11 @@
+FileNotFoundError in line 23 of /home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/Snakefile:
+[Errno 2] File b'/workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation_table_74.csv' does not exist: b'/workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation_table_74.csv'
+  File "/home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/Snakefile", line 205, in <module>
+  File "/home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/Snakefile", line 23, in get_simulation_list
+  File "/usr/lib64/python3.6/site-packages/pandas/io/parsers.py", line 702, in parser_f
+  File "/usr/lib64/python3.6/site-packages/pandas/io/parsers.py", line 429, in _read
+  File "/usr/lib64/python3.6/site-packages/pandas/io/parsers.py", line 895, in __init__
+  File "/usr/lib64/python3.6/site-packages/pandas/io/parsers.py", line 1122, in _make_engine
+  File "/usr/lib64/python3.6/site-packages/pandas/io/parsers.py", line 1853, in __init__
+  File "pandas/_libs/parsers.pyx", line 387, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas/_libs/parsers.pyx", line 705, in pandas._libs.parsers.TextReader._setup_parser_source

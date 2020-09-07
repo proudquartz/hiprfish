@@ -1,0 +1,21 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 108
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	collect_probe_coverage_results
+	1	combine_full_length_sequences
+	1	generate_full_probes
+	4
+
+[Sat Mar 14 20:50:57 2020]
+rule generate_full_probes:
+    input: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/taxon_best_probes_filtered.csv
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_blocking_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_helper_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_probes_summary.txt
+    jobid: 3
+    wildcards: design_id=DSGN0677
+
+Terminating processes on user request, this might take some time.
+Cancelling snakemake on user request.

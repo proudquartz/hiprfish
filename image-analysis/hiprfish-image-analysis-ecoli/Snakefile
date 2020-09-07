@@ -1,0 +1,129 @@
+###############################################################################################################
+# HiPR-FISH : simulation of probe coverage with different design parameters
+###############################################################################################################
+import pandas as pd
+import re
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+###############################################################################################################
+# Helper functions
+###############################################################################################################
+
+def get_output_summary_filename(input_image_list):
+    output_summary_filename = re.sub('.csv', '_results.csv', input_image_list)
+    return(output_summary_filename)
+
+def get_output_spectra_list(image_tab, data_dir):
+    output_spectra_list = ['{}/{}/{}_avgint_ids_replicate_29.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(output_spectra_list)
+
+def get_cell_ids_list(image_tab, data_dir):
+    cell_ids_list = ['{}/{}/{}_cell_ids.txt'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(cell_ids_list)
+
+def get_identification_list(image_tab, data_dir):
+    identification_list = ['{}/{}/{}_identification.png'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(identification_list)
+
+def get_classification_complete_list(image_tab, data_dir):
+    classification_complete_list = ['{}/{}/{}_classification_complete.txt'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(classification_complete_list)
+
+def get_channel_image_filenames(folder, sample, data_dir):
+    excitations = ['405', '488', '514', '561', '633']
+    channel_image_filenames = ['{}/{}/{}_{}.czi'.format(data_dir, folder, sample, exc) for exc in excitations]
+    return(channel_image_filenames)
+
+def get_calibration_toggle(image_tab, sample):
+    return(image_tab.loc[image_tab.IMAGES.values == sample].CALIBRATION.values[0])
+
+def get_calibration_filename(image_tab, sample):
+    return('{}/{}'.format(data_dir, image_tab.loc[image_tab.IMAGES.values == sample].CALIBRATION_FILENAME.values[0]))
+
+def get_bkg_intensity(image_tab, sample):
+    return(image_tab.loc[image_tab.IMAGES.values == sample].BkgFactorCorrected.values[0])
+
+def get_bkg_spec_filename(image_tab, sample, data_dir):
+    sample_name = image_tab.loc[image_tab.IMAGES.values == sample].SAMPLE.values[0]
+    image_name = image_tab.loc[image_tab.IMAGES.values == sample].SampleAdjacent.values[0]
+    bkg_spec_filename = '{}/{}/{}_bkg.csv'.format(data_dir, sample_name, image_name)
+    return(bkg_spec_filename)
+
+def get_reference_clf(image_tab, sample):
+    ref_folder = image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE_FOLDER.values[0]
+    spc = image_tab.loc[image_tab.IMAGES.values == sample].SPC.values[0]
+    ref_clf = '{}/{}/reference_simulate_{}_direct'.format(data_dir, ref_folder, spc)
+    return(ref_clf)
+
+data_dir = config['__default__']['DATA_DIR']
+input_image_list = config['images']['image_list_table']
+image_tab = pd.read_csv(input_image_list)
+output_spectra_list = get_output_spectra_list(image_tab, data_dir)
+cell_ids_list = get_cell_ids_list(image_tab, data_dir)
+identification_list = get_identification_list(image_tab, data_dir)
+classification_complete_list = get_classification_complete_list(image_tab, data_dir)
+output_filename = get_output_summary_filename(input_image_list)
+
+###############################################################################################################
+# Snake rules
+###############################################################################################################
+
+rule all:
+    input:
+        output_filename
+
+rule measure_reference_image:
+    input:
+        image_filenames = lambda wildcards: get_channel_image_filenames(wildcards.folder, wildcards.sample, data_dir)
+    output:
+        reference_csv = data_dir + '/{folder}/{sample}_avgint.csv',
+        reference_norm_csv = data_dir + '/{folder}/{sample}_avgint_norm.csv',
+        segmentation_npy = data_dir + '/{folder}/{sample}_seg.npy',
+        segmentation_png = data_dir + '/{folder}/{sample}_seg.png'
+    threads: 4
+    params:
+        calibration_toggle = lambda wildcards: get_calibration_toggle(image_tab, wildcards.sample),
+        calibration_filename = lambda wildcards: get_calibration_filename(image_tab, wildcards.sample)
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_spectral_image_measurement.py "
+        "-i {input.image_filenames} "
+        "-c {params.calibration_toggle} "
+        "-cf {params.calibration_filename} "
+
+rule classify_images:
+    input:
+        input_spectrum = data_dir + '/{folder}/{sample}_avgint.csv'
+    output:
+        avgint_id_csv = data_dir + '/{folder}/{sample}_avgint_ids_replicate_29.csv',
+        # cell_ids_txt = data_dir + '/{folder}/{sample}_cell_ids.txt',
+        # identification_png = data_dir + '/{folder}/{sample}_identification.png'
+    threads: 2
+    params:
+        reference_clf = lambda wildcards: get_reference_clf(image_tab, wildcards.sample),
+        bkg_intensity = lambda wildcards: get_bkg_intensity(image_tab, wildcards.sample),
+        bkg_spec_filename = lambda wildcards: get_bkg_spec_filename(image_tab, wildcards.sample, data_dir)
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_image_classification.py "
+        "{input.input_spectrum} "
+        "-rf {params.reference_clf} "
+        "-b {params.bkg_intensity} "
+        "-bs {params.bkg_spec_filename}"
+
+rule collect_measurement_results:
+    input:
+        reference_spectra = output_spectra_list,
+        # input_image_list = input_image_list,
+        # cell_ids_list = cell_ids_list,
+        # identification_list = identification_list,
+        data_dir = data_dir
+    output:
+        output_filename = output_filename
+    params:
+        image_type = config['images']['image_type']
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_collect_measurement_results.py "
+        "{input.data_dir} "
+        "{input.input_image_list} "
+        "{output.output_filename} "
+        "-t {params.image_type}"

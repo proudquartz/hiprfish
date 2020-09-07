@@ -1,0 +1,93 @@
+###############################################################################################################
+# HiPR-FISH : simulation of probe coverage with different design parameters
+###############################################################################################################
+import pandas as pd
+import re
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+###############################################################################################################
+# Helper functions
+###############################################################################################################
+
+def get_output_summary_filename(input_image_list):
+    output_summary_filename = re.sub('.csv', '_results.csv', input_image_list)
+    return(output_summary_filename)
+
+def get_output_spectra_list(image_tab, data_dir):
+    output_spectra_list = ['{}/{}/{}_avgint_norm.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(output_spectra_list)
+
+def get_classification_list(image_tab, data_dir):
+    output_spectra_list = ['{}/{}/{}_avgint_dilution_{}_avgint_ids_replicate_19.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES'], image_tab.loc[i, 'DILUTION']) for i in image_tab.index.tolist()]
+    return(output_spectra_list)
+
+def get_classification_complete_list(image_tab, data_dir):
+    classification_complete_list = ['{}/{}/{}_classification_complete.txt'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(classification_complete_list)
+
+def get_average_spectra(data_dir, image_tab, sample, dilution):
+    avg_spec_filename = '{}/{}/{}_avgint.csv'.format(data_dir, image_tab.loc[(image_tab.IMAGES.values == sample) & (image_tab.DILUTION.values == int(dilution)), 'SAMPLE'].values[0], image_tab.loc[(image_tab.IMAGES.values == sample) & (image_tab.DILUTION.values == int(dilution)), 'IMAGES'].values[0])
+    return(avg_spec_filename)
+
+def get_bkg_intensity(image_tab, sample):
+    return(image_tab.loc[image_tab.IMAGES.values == sample].BkgFactorCorrected.values[0])
+
+def get_bkg_spec_filename(image_tab, sample, data_dir):
+    sample_name = image_tab.loc[image_tab.IMAGES.values == sample].SAMPLE.values[0]
+    image_name = image_tab.loc[image_tab.IMAGES.values == sample].SampleAdjacent.values[0]
+    bkg_spec_filename = '{}/{}/{}_bkg.csv'.format(data_dir, sample_name, image_name)
+    return(bkg_spec_filename)
+
+def get_reference_clf(image_tab, sample):
+    ref_folder = image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE_FOLDER.values[0]
+    spc = image_tab.loc[image_tab.IMAGES.values == sample].SPC.values[0]
+    ref_clf = '{}/{}/reference_simulate_{}_direct'.format(data_dir, ref_folder, spc)
+    return(ref_clf)
+
+def get_dilution(dilution):
+    return(dilution)
+
+data_dir = config['__default__']['DATA_DIR']
+input_image_list = config['images']['image_list_table']
+bkg_spec_filename = config['background']['bkg_spec_filename']
+image_tab = pd.read_csv(input_image_list)
+classification_list = get_classification_list(image_tab, data_dir)
+output_filename = get_output_summary_filename(input_image_list)
+
+###############################################################################################################
+# Snake rules
+###############################################################################################################
+
+rule all:
+    input:
+        classification_list
+
+rule simulate_spectra:
+    input:
+        image_filenames = lambda wildcards: get_average_spectra(data_dir, image_tab, wildcards.sample, wildcards.dilution)
+    output:
+        average_csv = data_dir + '/{folder}/{sample}_avgint_dilution_{dilution}.csv',
+    params:
+        dilution = lambda wildcards: get_dilution(wildcards.dilution),
+        bkg_intensity = lambda wildcards: get_bkg_intensity(image_tab, wildcards.sample),
+        bkg_spec_filename = lambda wildcards: get_bkg_spec_filename(image_tab, wildcards.sample, data_dir)
+    threads: 1
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_simulate_spectra.py "
+        "-s {input.image_filenames} "
+        "-b {params.bkg_intensity} "
+        "-bs {params.bkg_spec_filename} "
+        "-d {params.dilution}"
+
+rule classify_spectra:
+    input:
+        input_spectrum = data_dir + '/{folder}/{sample}_avgint_dilution_{dilution}.csv'
+    output:
+        avgint_id_csv = data_dir + '/{folder}/{sample}_avgint_dilution_{dilution}_avgint_ids_replicate_19.csv',
+    params:
+        reference_clf = lambda wildcards: get_reference_clf(image_tab, wildcards.sample),
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_image_classification.py "
+        "{input.input_spectrum} "
+        "-rf {params.reference_clf} "

@@ -1,0 +1,45 @@
+"""
+Hao Shi 2019
+De Vlaminck Lab
+Cornell University
+"""
+
+###############################################################################################################
+# HiPR-FISH : image analysis pipeline for synthetic multispecies communities
+###############################################################################################################
+import pandas as pd
+import re
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+###############################################################################################################
+# Helper functions
+###############################################################################################################
+
+def get_intensity_image_list(image_tab, data_dir):
+    intensity_image_list = ['{}/{}/{}_intensity.pdf'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(intensity_image_list)
+
+data_dir = config['__default__']['DATA_DIR']
+input_image_list = config['images']['image_list_table']
+image_tab = pd.read_csv(input_image_list)
+intensity_image_list = get_intensity_image_list(image_tab, data_dir)
+
+###############################################################################################################
+# Snake rules
+###############################################################################################################
+
+rule all:
+    input:
+        # output_filename
+        intensity_image_list
+        # '/workdir/hs673/Runs/V1/Samples/HIPRFISH_imaging/03_12_2020_DSGN0673/03_12_2020_DSGN0673_fov_1_cell_information.csv'
+
+rule analyze_airy:
+    input:
+        image_filename = data_dir + '/{folder}/{sample}.czi'
+    output:
+        cell_info = data_dir + '/{folder}/{sample}_intensity.pdf',
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_airyscan_analysis.py "
+        "{input.image_filename} "

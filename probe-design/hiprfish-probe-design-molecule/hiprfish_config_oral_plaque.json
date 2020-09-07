@@ -1,0 +1,20 @@
+{
+    "__default__" :
+    {
+        "SCRIPTS_PATH" : "/home/hs673/Workflows/HIPRFISH_strain_v9",
+        "DATA_DIR" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_7",
+        "N_WORKERS": 108,
+    },
+    "blast":
+    {
+        "16s_db" : "/home/hs673/Resources/16SMicrobial/16S_ribosomal_RNA",
+    },
+    "simulations" :
+    {
+        "simulation_table" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation_table_80.csv",
+    },
+    "plotting":
+    {
+        "theme_color" : "white",
+    }
+}

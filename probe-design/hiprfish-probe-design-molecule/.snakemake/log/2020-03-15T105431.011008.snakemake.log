@@ -1,0 +1,33 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 108
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	collect_probe_coverage_results
+	1	collect_selected_probe_information
+	1	combine_full_length_sequences
+	1	generate_full_probes
+	5
+
+[Sun Mar 15 10:54:31 2020]
+rule collect_selected_probe_information:
+    input: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_probe_spacer_addition_complete.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation_table_74.csv, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/taxon_best_probes_filtered.csv, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/taxon_best_probes_summary.csv
+    jobid: 4
+    wildcards: design_id=DSGN0677
+
+[Sun Mar 15 10:54:33 2020]
+Finished job 4.
+1 of 5 steps (20%) done
+
+[Sun Mar 15 10:54:33 2020]
+rule generate_full_probes:
+    input: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/taxon_best_probes_filtered.csv
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_blocking_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_helper_probes_sequences.txt, /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_full_length_probes_summary.txt
+    jobid: 3
+    wildcards: design_id=DSGN0677
+
+Terminating processes on user request, this might take some time.
+Cancelling snakemake on user request.

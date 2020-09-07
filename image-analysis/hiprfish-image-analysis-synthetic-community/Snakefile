@@ -1,0 +1,140 @@
+"""
+Hao Shi 2019
+De Vlaminck Lab
+Cornell University
+"""
+
+###############################################################################################################
+# HiPR-FISH : image analysis pipeline for synthetic multispecies communities
+###############################################################################################################
+import pandas as pd
+import re
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+###############################################################################################################
+# Helper functions
+###############################################################################################################
+
+def get_output_summary_filename(data_dir, image_tab):
+    output_summary_filename = '{}/multispecies_hamming_heatmap.pdf'.format(data_dir)
+    return(output_summary_filename)
+
+def get_output_spectra_list(image_tab, data_dir):
+    output_spectra_list = ['{}/{}/{}_avgint_norm.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(output_spectra_list)
+
+def get_cell_info_list(image_tab, data_dir):
+    cell_ids_list = ['{}/{}/{}_cell_information_replicate_19.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(cell_ids_list)
+
+def get_identification_list(image_tab, data_dir):
+    identification_list = ['{}/{}/{}_identification.png'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(identification_list)
+
+def get_classification_complete_list(image_tab, data_dir):
+    classification_complete_list = ['{}/{}/{}_classification_complete.txt'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(classification_complete_list)
+
+def get_channel_image_filenames(folder, sample, data_dir):
+    excitations = ['488', '514', '561', '633']
+    channel_image_filenames = ['{}/{}/{}_{}.czi'.format(data_dir, folder, sample, exc) for exc in excitations]
+    return(channel_image_filenames)
+
+def get_calibration_toggle(image_tab, sample):
+    return(image_tab.loc[image_tab.IMAGES.values == sample].CALIBRATION.values[0])
+
+def get_calibration_filename(image_tab, sample):
+    return('{}/{}'.format(data_dir, image_tab.loc[image_tab.IMAGES.values == sample].CALIBRATION_FILENAME.values[0]))
+
+def get_reference_toggle(image_tab, sample):
+    return(image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE.values[0])
+
+def get_reference_clf(image_tab, sample):
+    ref_folder = image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE_FOLDER.values[0]
+    spc = image_tab.loc[image_tab.IMAGES.values == sample].SPC.values[0]
+    ref_clf = '{}/{}/reference_simulate_{}_synthetic_7b'.format(data_dir, ref_folder, spc)
+    return(ref_clf)
+
+def get_reference_umap(image_tab, sample):
+    ref_umap = image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE_UMAP.values[0]
+    return(ref_umap)
+
+def get_reference_normalization(image_tab, sample):
+    ref_scale = image_tab.loc[image_tab.IMAGES.values == sample].REFERENCE_NORMALIZATION.values[0]
+    return(ref_scale)
+
+def get_probe_design_filename(image_tab, sample):
+    probe_design_filename = image_tab.loc[image_tab.IMAGES.values == sample].PROBEDESIGN.values[0]
+    pdf_path = '{}/{}'.format(probe_design_dir, probe_design_filename)
+    return(pdf_path)
+
+def get_output_dir(data_dir, image_tab):
+    output_dir = '{}/{}'.format(data_dir, image_tab.loc[0, 'SAMPLE'])
+    return(output_dir)
+
+data_dir = config['__default__']['DATA_DIR']
+probe_design_dir = config['__default__']['PROBE_DESIGN_DIR']
+input_image_list = config['images']['image_list_table']
+theme_color = config['images']['theme_color']
+image_tab = pd.read_csv(input_image_list)
+cell_info_list = get_cell_info_list(image_tab, data_dir)
+output_filename = get_output_summary_filename(data_dir, image_tab)
+# output_dir = get_output_dir(data_dir, image_tab)
+output_dir = data_dir
+
+###############################################################################################################
+# Snake rules
+###############################################################################################################
+
+rule all:
+    input:
+        output_filename
+
+rule measure_image:
+    input:
+        image_filenames = lambda wildcards: get_channel_image_filenames(wildcards.folder, wildcards.sample, data_dir)
+    output:
+        cell_info = data_dir + '/{folder}/{sample}_avgint.csv',
+    params:
+        calibration_filename = lambda wildcards: get_calibration_filename(image_tab, wildcards.sample),
+        reference_clf = lambda wildcards: get_reference_clf(image_tab, wildcards.sample)
+    threads: 2
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_multispecies_spectral_image_measurement.py "
+        "-i {input.image_filenames} "
+        "-c {params.calibration_filename}"
+
+rule classify_spectra:
+    input:
+        spectra_filename = data_dir + '/{folder}/{sample}_avgint.csv'
+    output:
+        cell_info = data_dir + '/{folder}/{sample}_cell_information_replicate_19.csv',
+    params:
+        reference_clf = lambda wildcards: get_reference_clf(image_tab, wildcards.sample)
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_classify_spectra.py "
+        "-i {input.spectra_filename} "
+        "-r {params.reference_clf} "
+
+rule collect_measurement_results:
+    input:
+        input_image_list = input_image_list,
+        cell_info_list = cell_info_list
+    output:
+        error_rate_plot = output_dir + '/multispecies_hamming_heatmap.pdf'
+    params:
+        output_dir = output_dir,
+        probe_design_filename_1 = probe_design_dir + '/DSGN0641/DSGN0641_primerset_B_barcode_selection_MostSimple_full_length_probes.csv',
+        probe_design_filename_2 = probe_design_dir + '/DSGN0640/DSGN0640_primerset_A_barcode_selection_Random_full_length_probes.csv',
+        probe_design_filename_3 = probe_design_dir + '/DSGN0642/DSGN0642_primerset_C_barcode_selection_MostComplex_full_length_probes.csv',
+        theme_color = theme_color
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_analyze_multispecies_images.py "
+        "{input.input_image_list} "
+        "{params.output_dir} "
+        "-p "
+        "{params.probe_design_filename_1} "
+        "{params.probe_design_filename_2} "
+        "{params.probe_design_filename_3} "
+        "-t {params.theme_color}"

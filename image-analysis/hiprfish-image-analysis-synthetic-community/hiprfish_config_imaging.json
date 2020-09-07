@@ -1,0 +1,14 @@
+{
+    "__default__" :
+    {
+        "SCRIPTS_PATH" : "/home/hs673/Workflows/hiprfish-image-analysis/hiprfish-image-analysis-synthetic-community",
+        "DATA_DIR" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_imaging",
+        "PROBE_DESIGN_DIR" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_3/simulation"
+    },
+    "images" :
+    {
+        "image_list_table" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_imaging/images_table_multispecies_2.csv",
+        "image_type" : "M",
+        "theme_color": "black",
+    }
+}

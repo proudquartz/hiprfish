@@ -1,0 +1,3 @@
+Improvements:
+- adding spacer combo to probe name to avoid blowing up memory in merging probe_length_df and probes_blast in hiprfish_generate_full_probes.py
+- added '-dust no' and '-soft_masking false' to disable low complexity region masking in blastn. Change made on 5/14/2020, starting with mouse gut combined dataset at the family level

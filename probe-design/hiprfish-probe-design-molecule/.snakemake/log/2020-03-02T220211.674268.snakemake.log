@@ -1,0 +1,47 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 108
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	add_spacers
+	1	all
+	1	collect_probe_coverage_results
+	1	collect_selected_probe_information
+	1	combine_full_length_sequences
+	1	evaluate_probes_secondary
+	1	generate_full_probes
+	1	select_taxon_probes
+	8
+
+[Mon Mar  2 22:02:12 2020]
+rule evaluate_probes_secondary:
+    input: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/04_02_2017/log/genus_probe_evaluation_primary_complete.txt
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/probe_evaluation_secondary_complete.txt
+    jobid: 7
+    wildcards: design_id=DSGN0677
+
+[Tue Mar  3 01:58:42 2020]
+Finished job 7.
+1 of 8 steps (12%) done
+
+[Tue Mar  3 01:58:42 2020]
+rule select_taxon_probes:
+    input: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/probe_evaluation_secondary_complete.txt
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_probe_selection_complete.txt
+    jobid: 6
+    wildcards: design_id=DSGN0677
+
+[Tue Mar  3 02:00:08 2020]
+Error in rule select_taxon_probes:
+    jobid: 6
+    output: /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677/DSGN0677_probe_selection_complete.txt
+
+RuleException:
+CalledProcessError in line 351 of /home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/Snakefile:
+Command ' set -euo pipefail;  python3 /home/hs673/Workflows/HIPRFISH_strain_v8/hiprfish_select_probes.py /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/04_02_2017/evaluate/genus DSGN0677 /workdir/hs673/Runs/V1/Samples/HIPRFISH_7/simulation/DSGN0677 -n_workers 108 -t genus -tmin 50 -tmax 65 -m 14 -gc 40 -bot 0.99 -bt 27 ' returned non-zero exit status 1.
+  File "/home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/Snakefile", line 351, in __rule_select_taxon_probes
+  File "/usr/lib64/python3.6/concurrent/futures/thread.py", line 56, in run
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/id93_0001/hs673/Workflows/HIPRFISH_strain_v8/.snakemake/log/2020-03-02T220211.674268.snakemake.log

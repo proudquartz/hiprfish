@@ -1,0 +1,59 @@
+###############################################################################################################
+# HiPR-FISH : simulation of probe coverage with different design parameters
+###############################################################################################################
+import pandas as pd
+import re
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+###############################################################################################################
+# Helper functions
+###############################################################################################################
+
+def get_output_summary_filename(input_image_list):
+    output_summary_filename = re.sub('.csv', '_results.csv', input_image_list)
+    return(output_summary_filename)
+
+def get_spectral_centroid_list(image_tab, data_dir):
+    spectral_centroid_list = ['{}/{}/{}_centroid_spectral.csv'.format(data_dir, image_tab.loc[i, 'SAMPLE'], image_tab.loc[i, 'IMAGES']) for i in image_tab.index.tolist()]
+    return(spectral_centroid_list)
+
+def get_sample_name(folder, sample, data_dir):
+    sample_name = '{}/{}/{}_cell_information_consensus.csv'.format(data_dir, folder, sample)
+    return(sample_name)
+
+data_dir = config['__default__']['DATA_DIR']
+input_image_list = config['images']['image_list_table']
+image_tab = pd.read_csv(input_image_list)
+centroid_spectral_list = get_spectral_centroid_list(image_tab, data_dir)
+output_filename = get_output_summary_filename(input_image_list)
+
+###############################################################################################################
+# Snake rules
+###############################################################################################################
+
+rule all:
+    input:
+        data_dir + '/ecoli_1023_mix_barcode_neighbor_heatmap.pdf'
+
+rule calculate_spectral_centroid:
+    input:
+        sample_name = lambda wildcards: get_sample_name(wildcards.folder, wildcards.sample, data_dir)
+    output:
+        spectral_centroid_filename = data_dir + '/{folder}/{sample}_centroid_spectral.csv',
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_calculate_spectral_centroid.py "
+        "-s {input.sample_name} "
+
+rule collect_spectral_centroid_results:
+    input:
+        centroid_spectral_list = centroid_spectral_list,
+        input_image_list = input_image_list
+    output:
+        spectral_centroid_summary_filename = data_dir + '/ecoli_1023_mix_barcode_neighbor_heatmap.pdf'
+    params:
+        data_dir = data_dir
+    shell:
+        "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_imaging_collect_measurement_results.py "
+        "{params.data_dir} "
+        "{input.input_image_list} "

@@ -1,0 +1,15 @@
+{
+    "__default__" :
+    {
+        "SCRIPTS_PATH" : "/home/hs673/Workflows/HIPRFISH_v14",
+        "DATA_DIR" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_3",
+    },
+    "blast":
+    {
+        "16s_db" : "/home/hs673/Resources/16SMicrobial/16SMicrobial",
+    },
+    "simulations" :
+    {
+        "simulation_table" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_3/simulation_table_57.csv"
+    }
+}
