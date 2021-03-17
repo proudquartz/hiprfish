@@ -1,5 +1,8 @@
 # HiPR-FISH Probe Design and Image Analysis 
 
+## Acknowledgement
+This suite of code makes use of open source packages, including `numpy`, `pandas`, `biopython`, `bioformats`, `javabridge`, `scikit-image`, `scikit-learn`, and `scipy`.
+
 ## HiPR-FISH Image Analysis
 Image analysis pipelines and scripts for HiPR-FISH experiments
 
