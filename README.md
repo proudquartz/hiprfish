@@ -60,7 +60,7 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
       * `SCRIPTS_PATH`: path to the folder that contains all the scripts
       * `DATA_DIR`: path to the folder that contains input folders and files
    - `blast`
-      * `16s_db`: path to the local copy of NCBI 16SMicrobial database
+      * `16s_db`: path to the local copy of NCBI 16SMicrobial database. If you put the database files in `/[PATH_TO_16S_DB]/16SMicrobial` (i.e. the path name to the full database files look like `/[PATH_TO_16S_DB]/16SMicrobial/16SMicrobial.n*`), you should set the value of this variable to `/[PATH_TO_16S_DB]/16SMicrobial/16SMicrobial`.
    -  `usearch`
       * `path`: path to the usearch program
    - `simulations`
