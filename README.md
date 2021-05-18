@@ -95,6 +95,9 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
          2. Random: randomly assign barcodes to taxa
          3. MostComplex: assign barcodes by barcode complexity, starting with the most complex ones. Barcodes with more bits are considered more complex.
        * `BPLC`: minimum blocking probe length threhold. Blocking probes with length lower than this threshold is considered likely to be washed off and do not need to be included in the final probe pool. Default is 15 bp.
+       * `THEME_COLOR`: overall theme color for axes and labels of the generated plots. Available options are:
+          1. black: plots will have black axes and labels - works well against light background slides
+          2. white: plots will have white axes and labels - works well against dark background slides
 2. FASTA file
    - A FASTA file containing full length 16S sequences of the community to be probed. This file can be curated from public databases, or it can come from your own long read sequencing datasets, such as those from PacBio. The input file should be placed in `DATA_DIR/[SAMPLE]/input/[SAMPLE].fasta`.
 
