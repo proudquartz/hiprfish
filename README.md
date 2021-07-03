@@ -90,11 +90,17 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
        * `TPN`: number of top probes to select for each taxon, if the probe selection method is set to `TopN`
        * `FREQLL`: minimum abundance threshold. Default is zero, and is generally left at zero. Can be increased in situations where the in silico taxonomic coverage is not as good as desired. A higher value means increasing the probe design space for the more abundance sequences at the risk of those probes mishybridizing to the lower abundance taxa in the experiment.
        * `BOT`: minimum blast on target rate threshold. Probes with blast on target values lower than this value is considered *promiscuous*, and is not included in the final probe pool.
+       * `BITSCORE_THRESH`: blast bitscore cutoff. Any blast hits (between probe and target sequence) with a score higher than this number will be considered significant and used for evaluation of probe specificity.
        * `BARCODESELECTION`: method for barcode assignment to taxa. Available options are:
          1. MostSimple: assign barcodes by barcode complexity, starting with the simplest ones. Barcodes with more bits are considered more complex.
          2. Random: randomly assign barcodes to taxa
          3. MostComplex: assign barcodes by barcode complexity, starting with the most complex ones. Barcodes with more bits are considered more complex.
        * `BPLC`: minimum blocking probe length threhold. Blocking probes with length lower than this threshold is considered likely to be washed off and do not need to be included in the final probe pool. Default is 15 bp.
+       * `HELPER_PROBE_REPEAT`: number of times to repeat helper sequences in the final complex oligo pool. Default is 14 so that the any inidividual helper sequence is roughly at the same concentration as any individual encoding probe.
+       * `SOD`: assumed sodium concentration for caluclation of melting temperatures. Default is 390.
+       * `DNACONC`: assumed probe concentration for calculation of melting temperatures. Default is 5.
+       * `MT_CUTOFF`: off target melting temperature cutoff. Probes would need to have a maximum off target melting temp smaller than this number to be considered specific. Default is 60. Note that this seems high because there seem to be a constant offset between melting temperatures calculated by primer3 and biopython built-in melting temperature calculation. This parameter refers to the calculation from the biopython implementation, which generally are higher than the primer3 calculations.
+       * `OT_GC_CUTOFF`: off target maximum GC count. A probe would only be considered specific if any of its off-target binding sites have less than this many bases of G or C. Default is 7.
        * `THEME_COLOR`: overall theme color for axes and labels of the generated plots. Available options are:
           1. black: plots will have black axes and labels - works well against light background slides
           2. white: plots will have white axes and labels - works well against dark background slides
