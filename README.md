@@ -10,15 +10,6 @@ Image analysis pipelines and scripts for HiPR-FISH experiments
 
 This pipeline enables automated image analysis for highly multiplexed FISH experiments on microbial communities. In most cases, the main pipeline is a snakemake workflow. There are also standalone scripts used for specific analyses presented in our paper.
 
-### Before running the pipeline
-1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html),
-2. Install the environment by running the following command\
-     `conda env create hiprfish python=3.5`\
-     `conda install pandas`\
-     `conda install -c anaconda biopython`\
-     `conda install javabridge`\
-     `conda install -c bioconda python-bioformats`\
-
 ## HiPR-FISH Probe Design
 Probe design pipeline for HiPR-FISH experiments
 
@@ -35,34 +26,36 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
 
 ### Before running the pipeline
 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html),
-2. Install the environment by either
-   - Running `conda env create -f hiprfish.yml` in a Terminal window,\
-
-  OR
-
-   - Running the following command\
-     `conda env create hiprfish python=3.5`\
-     `conda install pandas=0.25`\
-     `conda install -c anaconda biopython`\
-     `conda install -c etetoolkit ete3`\
-     `conda install snakemake`\
-     `conda install blast`\
-     `source activate hiprfish`\
+2. Install the environment by running the following commands:
+     `conda create -n hiprfish python=3.6`\
+     `conda activate hiprfish`\
+     `conda install pandas`\
+     `conda install -c bioconda primer3 -y`\
+     `conda install -c anaconda joblib -y`\
+     `conda install -c anaconda biopython -y`\
+     `conda install -c etetoolkit ete3 ete_toolchain -y`\
+     `conda install -n hiprfish -c conda-forge mamba -y`\
+     `mamba install -c conda-forge -c bioconda snakemake -y`
      `pip install SetCoverPy`
      `pip install tables`
      `pip install openpyxl`
      `pip install matplotlib`
      
+3. Install usearch. [Download](https://www.drive5.com/usearch/download.html) usearch executable. Move the downloaded file to a directory of your choosing. 
+     
+4. Install blast. [Download](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) the latest version and install the downloaded package. 
 
-3. Activate the environment by running `source activate hiprfish`,
-4. Edit the `hiprfish_config.json file` to point the pipeline to the correct directories.
+6. Edit the `hiprfish_config.json file` to point the pipeline to the correct directories.
    - `__default__`
       * `SCRIPTS_PATH`: path to the folder that contains all the scripts
       * `DATA_DIR`: path to the folder that contains input folders and files
    - `blast`
-      * `16s_db`: path to the local copy of NCBI 16SMicrobial database. If you put the database files in `/[PATH_TO_16S_DB]/16SMicrobial` (i.e. the path name to the full database files look like `/[PATH_TO_16S_DB]/16SMicrobial/16SMicrobial.n*`), you should set the value of this variable to `/[PATH_TO_16S_DB]/16SMicrobial/16SMicrobial`.
+      * `16s_db`: path to the local copy of NCBI 16SMicrobial database. If you put the database files in `/[PATH_TO_16S_DB]/16S_ribosoma_RNA` (i.e. the path name to the full database files look like `/[PATH_TO_16S_DB]/16S_ribosoma_RNA/16S_ribosoma_RNA.n*`), you should set the value of this variable to `/[PATH_TO_16S_DB]/16S_ribosoma_RNA/16S_ribosoma_RNA`.
+   -  `primer3`
+      * `primer3_exec_dir`: path to the primer3 executable. If you installed primer3 via conda, you can likely just put "primer3_core" here. If that alias somehow does not work, you can put the full path to the primer3_core executable instead.
+      * `primer3_config_dir`: configuration files for primer3. You can [download](https://github.com/primer3-org/primer3) the source repository and copy the primer3_config folder to a location your choosing on your local system.
    -  `usearch`
-      * `path`: path to the usearch program
+      * `usearch_dir`: path to the usearch executable
    - `simulations`
       * `simulation_table`: path to the simulation summary file
 
