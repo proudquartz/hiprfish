@@ -1720,7 +1720,7 @@ def measure_spatial_association_vs_abundance_by_treatment(sam_tab, taxon_lookup,
         ax.text(pos_x, pos_y, i+1, ha = ha_list_sorted[i], va = 'center', fontsize = 6)
 
     ax.tick_params(direction = 'in', labelsize = 6)
-    plt.xlabel('$\log_{2}$(FC)', fontsize = 6)
+    plt.xlabel('Fold Change', fontsize = 6)
     plt.ylabel('-$\log_{10}$(p)', fontsize = 6)
     ax = plt.subplot(gs[2,0])
     for i in range(len(labels_list)):

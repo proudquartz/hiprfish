@@ -1,26 +1,24 @@
-import argparse
-import threading
-import pandas as pd
-import subprocess
 import os
-import multiprocessing
-import glob
 import re
-import itertools
-from SetCoverPy import setcover
-import numpy as np
+import glob
 import random
+import argparse
+import itertools
+import threading
+import subprocess
+import numpy as np
+import pandas as pd
+import multiprocessing
 from ete3 import NCBITaxa
 from SetCoverPy import setcover
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC, generic_dna
-from Bio.Blast.Applications import NcbiblastnCommandline
-from Bio.SeqUtils import MeltingTemp as mt
 from Bio.SeqUtils import GC
-from ete3 import NCBITaxa
+from Bio.SeqRecord import SeqRecord
+from Bio.SeqUtils import MeltingTemp as mt
+from Bio.Blast.Applications import NcbiblastnCommandline
 import tables
+
 pd.options.mode.chained_assignment = None
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -220,12 +218,12 @@ def calculate_gc_count(df):
 
 def get_blast_lineage_slim(blast_lineage_filename, otu):
     if otu == 'F':
-        blast_lineage_df = pd.read_table(blast_lineage_filename, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage_filename, dtype = {'staxids':str}, sep = '\t')
         lineage_columns = ['molecule_id', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
         blast_lineage_slim = blast_lineage_df[lineage_columns]
         blast_lineage_slim.loc[:,'molecule_id'] = blast_lineage_slim.molecule_id.apply(sub_slash)
     else:
-        blast_lineage_df = pd.read_table(blast_lineage, header = None, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage, header = None, dtype = {'staxids':str}, sep = '\t')
         blast_lineage_df.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
         blast_lineage_filtered = blast_lineage_df[blast_lineage_df['rec_type'] != 'C']
         blast_lineage_filtered.loc[:,'target_taxon'] = 'Cluster' + blast_lineage_filtered['cluster_num'].astype(str)
@@ -238,12 +236,12 @@ def get_blast_lineage_slim(blast_lineage_filename, otu):
 
 def get_blast_lineage_strain_slim(blast_lineage_filename, otu):
     if otu == 'F':
-        blast_lineage_df = pd.read_table(blast_lineage_filename, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage_filename, dtype = {'staxids':str}, sep = '\t')
         lineage_columns = ['molecule_id', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
         blast_lineage_slim = blast_lineage_df[lineage_columns]
         blast_lineage_slim.loc[:,'molecule_id'] = blast_lineage_slim.molecule_id.apply(sub_slash)
     else:
-        blast_lineage_df = pd.read_table(blast_lineage, header = None, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage, header = None, dtype = {'staxids':str}, sep = '\t')
         blast_lineage_df.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
         blast_lineage_filtered = blast_lineage_df[blast_lineage_df['rec_type'] != 'C']
         blast_lineage_filtered.loc[:,'target_taxon'] = 'Cluster' + blast_lineage_filtered['cluster_num'].astype(str)
@@ -265,14 +263,14 @@ def get_taxon_abundance(input_consensus_directory, target_taxon, target_taxon_fu
         elif consensus_num_seq == 1:
             cluster = 0
             taxon_uc_file = input_consensus_directory + '/' + str(target_taxon) + '.uc'
-            taxon_uc = pd.read_table(taxon_uc_file, header = None)
+            taxon_uc = pd.read_csv(taxon_uc_file, header = None, sep = '\t')
             taxon_uc.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
             taxon_uc_cluster_counts = taxon_uc[taxon_uc['rec_type'] == 'C']
             taxon_abundance = taxon_uc_cluster_counts[taxon_uc_cluster_counts['cluster_num'] == cluster]['seq_length'].values[0]
         else:
             cluster = int(re.sub('.*_Cluster', '', target_taxon_full))
             taxon_uc_file = input_consensus_directory + '/' + str(target_taxon) + '.uc'
-            taxon_uc = pd.read_table(taxon_uc_file, header = None)
+            taxon_uc = pd.read_csv(taxon_uc_file, header = None, sep = '\t')
             taxon_uc.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
             taxon_uc_cluster_counts = taxon_uc[taxon_uc['rec_type'] == 'C']
             taxon_abundance = taxon_uc_cluster_counts[taxon_uc_cluster_counts['cluster_num'] == cluster]['seq_length'].values[0]
@@ -284,11 +282,11 @@ def get_probes(probe_evaluation_filename, input_probe_directory, otu):
     if otu == 'F':
         target_taxon_full = re.sub('.probe.evaluation.h5', '', os.path.basename(probe_evaluation_filename))
         target_taxon = int(re.sub('_Cluster[0-9]+', '', target_taxon_full))
-        probes = pd.read_table(input_probe_directory + '/' + str(target_taxon_full) + '_consensus.int', skiprows = 3, header = None, delim_whitespace = True)
+        probes = pd.read_csv(input_probe_directory + '/' + str(target_taxon_full) + '_consensus.int', skiprows = 3, header = None, delim_whitespace = True)
     else:
         target_taxon_full = re.sub('.probe_evaluation.h5', '', os.path.basename(probe_evaluation_filename))
         target_taxon = os.path.split(os.path.split(probe_blast_directory)[0])[0]
-        probes = pd.read_table(input_probe_directory + '/' + str(target_taxon) + '.int', skiprows = 3, header = None, delim_whitespace = True)
+        probes = pd.read_csv(input_probe_directory + '/' + str(target_taxon) + '.int', skiprows = 3, header = None, delim_whitespace = True)
     probes.columns = ['probe_id', 'seq', 'p_start', 'ln', 'N', 'GC', 'Tm', 'self_any_th', 'self_end_th', 'hairpin', 'quality']
     probes.loc[:,'target_taxon'] = target_taxon
     probes.loc[:,'target_taxon_full'] = target_taxon_full

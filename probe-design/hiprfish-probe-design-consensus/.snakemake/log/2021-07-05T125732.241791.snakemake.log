@@ -1,0 +1,41 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                                   count    min threads    max threads
+----------------------------------  -------  -------------  -------------
+add_spacers                               1              1              1
+all                                       1              1              1
+blast_probes                              1              1              1
+collect_probe_coverage_results            1              1              1
+collect_selected_probe_information        1              1              1
+combine_full_length_sequences             1              1              1
+design_probes                             1              1              1
+evaluate_taxon_probes                     1              1              1
+generate_full_probes                      1              1              1
+select_taxon_probes                       1              1              1
+total                                    10              1              1
+
+Select jobs to execute...
+
+[Mon Jul  5 12:57:33 2021]
+rule design_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.fasta, /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/{*}_consensus.int (dynamic)
+    jobid: 8
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+Subsequent jobs will be added dynamically depending on the output of this job
+[Mon Jul  5 12:57:46 2021]
+Error in rule design_probes:
+    jobid: 8
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/{*}_consensus.int (dynamic)
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_design_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.fasta /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample primer3_core /Users/hao/miniconda3/envs/hiprfish/lib/python3.8/site-packages/primer3/src/libprimer3/primer3_config -db /Users/hao/Documents/Resources/16S_ribosomal_RNA/16S_ribosomal_RNA -t genus -s 0.1
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/.snakemake/log/2021-07-05T125732.241791.snakemake.log

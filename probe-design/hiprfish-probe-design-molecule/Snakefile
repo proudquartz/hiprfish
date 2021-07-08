@@ -202,7 +202,8 @@ def get_design_level(design_level):
 
 data_dir = config['__default__']['DATA_DIR']
 sim_input_filename = config['simulations']['simulation_table']
-n_workers = config['__default__']['N_WORKERS']
+n_workers = config['__default__']['N_WORKERS'
+primer3_exec_dir = config['primer3']['primer3_exec_dir']
 theme_color = config['plotting']['theme_color']
 pipeline_version = os.path.basename(config['__default__']['SCRIPTS_PATH'])
 sim_output_filename = get_simulation_summary_filenames(sim_input_filename)
@@ -241,10 +242,11 @@ rule design_probes:
     threads: 1
     params:
         primer3_dir = data_dir + '/{sample}/primer3',
+        primer3_exec_dir = primer3_exec_dir,
         n_workers = n_workers
     shell:
         "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_design_probes.py "
-        "{params.primer3_dir} -n_workers {params.n_workers}"
+        "{params.primer3_dir} {params.primer3_exec_dir} -n_workers {params.n_workers}"
 
 rule combine_probes:
     input:

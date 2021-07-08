@@ -9,7 +9,6 @@ import subprocess
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC, generic_dna
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.SeqUtils import GC
 from matplotlib import pyplot as plt
@@ -319,7 +318,7 @@ def generate_helper_probes(design_dir, blast_directory, target_rank, max_continu
             helper_probes = helper_probes.merge(helper_probes_summary, on = 'probe_id')
             helper_probes['seqrc'] = ''
             for i in range(helper_probes.shape[0]):
-                helper_probes.loc[i, 'seqrc'] = str(Seq(helper_probes.loc[i, 'seq'], generic_dna).reverse_complement())
+                helper_probes.loc[i, 'seqrc'] = str(Seq(helper_probes.loc[i, 'seq']).reverse_complement())
             helper_probes.loc[:,'quadg'] = (helper_probes['seqrc'].str.upper().str.count('GGGG')) + (helper_probes['seqrc'].str.upper().str.count('GGGGG'))
             helper_probes = helper_probes.loc[(helper_probes.quadg.values == 0) & (helper_probes.max_average_encoding_interference_fraction_0bp.values < 1e-3),:]
             for hsp in helper_probes.helper_source_probe.drop_duplicates():
@@ -425,13 +424,13 @@ def check_final_probes_blast(design_dir, probes, mch, bot, target_rank, blast_li
     # probes_filename = '{}/full_length_probes.csv'.format(design_dir)
     design_dir_folder = os.path.split(design_dir)[1]
     probes_blast_filename = '{}/{}_full_length_probes_unique.blast.out'.format(design_dir, design_dir_folder)
-    probes_blast = pd.read_table(probes_blast_filename, header = None)
+    probes_blast = pd.read_csv(probes_blast_filename, header = None, sep = '\t')
     probes_blast.columns = ['probe_id', 'molecule_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'probe_start', 'probe_end', 'molecule_start', 'molecule_end', 'evalue', 'bitscore', 'staxids', 'qseq', 'sseq']
     # probes = pd.read_csv(probes_filename, dtype = {'code': str})
-    probes['probe_length'] = probes['rna_seq'].apply(len) - 6
-    probes_length_df = probes[['probe_id', 'target_taxon', 'probe_length']]
+    probes.loc[:,'probe_length'] = probes.loc[:,'rna_seq'].apply(len) - 6
+    probes_length_df = probes.loc[:,['probe_id', 'target_taxon', 'probe_length']]
     probes_blast = probes_blast.merge(probes_length_df, on = 'probe_id', how = 'left')
-    blast_lineage = pd.read_table(blast_lineage_filename, dtype = {'staxids':str})
+    blast_lineage = pd.read_csv(blast_lineage_filename, dtype = {'staxids':str}, sep = '\t')
     blast_lineage_slim = blast_lineage.loc[:,['molecule_id', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']]
     probes_blast = probes_blast.merge(blast_lineage_slim, on = 'molecule_id', how = 'left')
     probes_blast_summary = probes_blast.groupby('probe_id', axis = 0).apply(summarize_final_probe_blast, mch = mch, target_rank = target_rank)
@@ -449,9 +448,9 @@ def check_final_probes_blast(design_dir, probes, mch, bot, target_rank, blast_li
     probes_final_filter.to_csv('{}/{}_primerset_{}_barcode_selection_{}_full_length_probes.csv'.format(design_dir, design_dir_folder, primerset, barcode_selection), header = True, index = False)
     probes_final_filter_summary = probes_final_filter.target_taxon.value_counts()
     probes_final_filter_summary.columns = ['Taxon', 'Probe_Richness']
-    probes_final_filter_summary.to_csv('{}/{}_primerset_{}_barcode_selection_{}_probe_richness_summary.csv'.format(design_dir, design_dir_folder, primerset, barcode_selection))
+    probes_final_filter_summary.to_csv('{}/{}_primerset_{}_barcode_selection_{}_probe_richness_summary.csv'.format(design_dir, design_dir_folder, primerset, barcode_selection), header = True, index = False)
     probes_final_filter.loc[:,'probe_full_seq'].str.upper().to_csv('{}/{}_full_length_probes_sequences.txt'.format(design_dir, design_dir_folder), header = False, index = False)
-    probes_order_format = probes_final_filter[['abundance', 'probe_id', 'probe_full_seq']]
+    probes_order_format = probes_final_filter.loc[:,['abundance', 'probe_id', 'probe_full_seq']].copy()
     probes_order_format = probes_order_format.assign(Amount = '25nm', Purification = 'STD')
     probes_order_format.loc[probes_order_format.loc[:,'probe_full_seq'].str.len() > 60, 'Amount'] = '100nm'
     probes_order_format.loc[probes_order_format.loc[:,'probe_full_seq'].str.len() > 60, 'Purification'] = 'PAGE'
@@ -459,7 +458,7 @@ def check_final_probes_blast(design_dir, probes, mch, bot, target_rank, blast_li
     probes_order_format.to_excel('{}/{}_primerset_{}_barcode_selection_{}_full_length_probes_order_format.xlsx'.format(design_dir, design_dir_folder, primerset, barcode_selection))
     return(probes_final_filter)
 
-def generate_probe_statistics_plots(design_dir, probes_final_filter, primerset, barcode_selection, theme_color):
+def generate_probe_statistics_plots(design_dir, probes_final_filter, primerset, barcode_selection, theme_color, target_rank):
     design_dir_folder = os.path.split(design_dir)[1]
     fig = plt.figure()
     fig.set_size_inches(cm_to_inches(5), cm_to_inches(5))
@@ -535,8 +534,8 @@ def generate_probe_statistics_plots(design_dir, probes_final_filter, primerset, 
         ot = pd.read_csv(off_target_filenames[i], dtype = {'species':str})
         ot['OTGC'] = ot.qseq.apply(GC)
         ot['OTGCINT'] = ot.OTGC.values*ot.length.values
-        ot_gc_temp = ot.groupby('species').agg({'OTGCINT': 'max'}).reset_index().sort_values(by = 'species', ascending = True)
-        ot_gc.loc[ot_gc_temp.species.values,taxid_list[i]] = ot_gc_temp.OTGCINT.values/100
+        ot_gc_temp = ot.groupby(target_rank).agg({'OTGCINT': 'max'}).reset_index().sort_values(by = target_rank, ascending = True)
+        ot_gc.loc[ot_gc_temp.loc[:,target_rank].values,taxid_list[i]] = ot_gc_temp.OTGCINT.values/100
     fig = plt.figure()
     fig.set_size_inches(cm_to_inches(8), cm_to_inches(7))
     plt.imshow(ot_gc.values, cmap = 'inferno')
@@ -608,7 +607,7 @@ def main():
     probes_final_filter = check_final_probes_blast(args.design_dir, oligo_df, args.mch, args.bot, args.target_rank, blast_lineage_filename, args.primerset, args.barcode_selection)
     generate_blocking_probes(args.design_dir, args.bplc, args.target_rank, plf = args.plf, primer = args.primer, primerset = args.primerset, barcode_selection = args.barcode_selection)
     generate_helper_probes(args.design_dir, args.blast_directory, args.target_rank, args.mch, plf = args.plf, primer = args.primer, primerset = args.primerset, barcode_selection = args.barcode_selection, helper_probe_repeat = args.helper_probe_repeat)
-    generate_probe_statistics_plots(args.design_dir, probes_final_filter, args.primerset, args.barcode_selection, args.theme_color)
+    generate_probe_statistics_plots(args.design_dir, probes_final_filter, args.primerset, args.barcode_selection, args.theme_color, args.target_rank)
     generate_probe_summary_file(args.design_dir, probes_final_filter, args.primerset, args.barcode_selection)
     return
 

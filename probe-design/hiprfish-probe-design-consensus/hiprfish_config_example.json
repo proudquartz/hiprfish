@@ -1,0 +1,24 @@
+{
+    "__default__" :
+    {
+        "SCRIPTS_PATH" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus",
+        "DATA_DIR" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example",
+    },
+    "blast":
+    {
+        "16s_db" : "/Users/hao/Documents/Resources/16S_ribosomal_RNA/16S_ribosomal_RNA",
+    },
+    "primer3":
+    {
+        "primer3_exec_dir" : "primer3_core",
+        "primer3_config_dir" : "/Users/hao/miniconda3/envs/hiprfish/lib/python3.6/site-packages/primer3_config"
+    },
+    "usearch":
+    {
+        "usearch_dir" : "/Users/hao/Documents/Resources/usearch"
+    },
+    "simulations" :
+    {
+        "simulation_table" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/simulation_table_example.csv"
+    }
+}

@@ -1,24 +1,21 @@
-import argparse
-import pandas as pd
-import subprocess
+
 import os
-import multiprocessing
-import glob
 import re
-import itertools
-from SetCoverPy import setcover
-import numpy as np
+import glob
 import random
+import argparse
+import itertools
+import subprocess
+import numpy as np
+import pandas as pd
+import multiprocessing
 from ete3 import NCBITaxa
 from SetCoverPy import setcover
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC, generic_dna
-from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.SeqUtils import MeltingTemp as mt
-from ete3 import NCBITaxa
-import re
+from Bio.Blast.Applications import NcbiblastnCommandline
 import time
 import smtplib
 from joblib import Parallel, delayed
@@ -83,11 +80,11 @@ def sub_slash(str):
 
 def get_blast_lineage_slim(blast_lineage_filename, otu):
     if otu == 'F':
-        blast_lineage_df = pd.read_table(blast_lineage_filename, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage_filename, dtype = {'staxids':str}, sep = '\t')
         lineage_columns = ['molecule_id', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain']
         blast_lineage_slim = blast_lineage_df[lineage_columns]
     else:
-        blast_lineage_df = pd.read_table(blast_lineage, header = None, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(blast_lineage, header = None, dtype = {'staxids':str}, sep = '\t')
         blast_lineage_df.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
         blast_lineage_filtered = blast_lineage_df[blast_lineage_df['rec_type'] != 'C']
         blast_lineage_filtered['target_taxon'] = 'Cluster' + blast_lineage_filtered['cluster_num'].astype(str)
@@ -106,7 +103,7 @@ def evaluate_taxon_probes(taxon_probe_directory, blast_lineage_slim, store):
     for filename in probe_filenames:
         blast_output_filename = filename + '.blast.out'
         try:
-            chunk = pd.read_table(blast_output_filename, header = None)
+            chunk = pd.read_csv(blast_output_filename, header = None, sep = '\t')
             chunk.columns = ['probe_id', 'molecule_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'probe_start', 'probe_end', 'molecule_start', 'molecule_end', 'evalue', 'bitscore', 'staxids', 'qseq', 'sseq']
             chunk['mch'] = mch_test_v4(chunk, blast_output_filename)
             chunk['molecule_id'] = chunk.molecule_id.apply(sub_slash)

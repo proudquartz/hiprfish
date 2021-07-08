@@ -1,0 +1,90 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                                   count    min threads    max threads
+----------------------------------  -------  -------------  -------------
+add_spacers                              21              1              1
+all                                       1              1              1
+blast_probes                             21              1              1
+collect_probe_coverage_results            1              1              1
+collect_selected_probe_information        2              1              1
+combine_full_length_sequences             2              1              1
+evaluate_taxon_probes                    21              1              1
+generate_full_probes                      2              1              1
+select_taxon_probes                      21              1              1
+total                                    92              1              1
+
+Select jobs to execute...
+
+[Wed Jul  7 16:42:33 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842.probe.blast.complete.txt
+    jobid: 85
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=2767842
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Wed Jul  7 16:42:33 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716.probe.blast.complete.txt
+    jobid: 97
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=1716
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Wed Jul  7 16:42:33 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/species/s_0.1/primer3/285_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/species/s_0.1/primer3/285.probe.blast.complete.txt
+    jobid: 29
+    wildcards: sample=test_sample, target_rank=species, similarity=0.1, taxon=285
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Wed Jul  7 16:42:33 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338.probe.blast.complete.txt
+    jobid: 105
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=338
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+[Wed Jul  7 16:42:35 2021]
+Error in rule blast_probes:
+    jobid: 97
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716.probe.blast.complete.txt
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_blast_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.oriented.fasta /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716_consensus.int
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+[Wed Jul  7 16:42:35 2021]
+
+Error in rule blast_probes:
+    jobid: 85
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842.probe.blast.complete.txt
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_blast_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.oriented.fasta /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842_consensus.int
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Wed Jul  7 16:42:35 2021]
+Error in rule blast_probes:
+    jobid: 29
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/species/s_0.1/primer3/285.probe.blast.complete.txt
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_blast_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.oriented.fasta /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/species/s_0.1/primer3/285_consensus.int
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Wed Jul  7 16:42:35 2021]
+Error in rule blast_probes:
+    jobid: 105
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338.probe.blast.complete.txt
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_blast_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.oriented.fasta /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338_consensus.int
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/.snakemake/log/2021-07-07T164201.726033.snakemake.log

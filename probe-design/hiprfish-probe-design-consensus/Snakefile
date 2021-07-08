@@ -259,6 +259,9 @@ def get_blast_database_by_design_id(sam_tab, design_id, data_dir):
 
 data_dir = config['__default__']['DATA_DIR']
 sim_input_filename = config['simulations']['simulation_table']
+primer3_exec_dir = config['primer3']['primer3_exec_dir']
+primer3_config_dir = config['primer3']['primer3_config_dir']
+usearch_dir = config['usearch']['usearch_dir']
 pipeline_version = os.path.basename(config['__default__']['SCRIPTS_PATH'])
 sim_output_filename = get_simulation_summary_filenames(sim_input_filename)
 design_list, sim_tab = get_simulation_list(sim_input_filename, data_dir)
@@ -280,17 +283,20 @@ rule all:
 rule design_probes:
     input:
         fasta_filename = data_dir + '/{sample}/input/{sample}.fasta',
-        sample_dir = data_dir + '/{sample}'
+        sample_dir = data_dir + '/{sample}',
     output:
         design_probe_filename = dynamic(data_dir + '/{sample}/{target_rank}/s_{similarity}/primer3/{taxon}_consensus.int')
     threads: 1
     params:
         sample = "{sample}",
         target_rank = "{target_rank}",
-        similarity = "{similarity}"
+        similarity = "{similarity}",
+        primer3_exec_dir = primer3_exec_dir,
+        primer3_config_dir = primer3_config_dir,
+        usearch_dir = usearch_dir,
     shell:
         "python3 {config[__default__][SCRIPTS_PATH]}/hiprfish_design_probes.py "
-        "{input.fasta_filename} {input.sample_dir} "
+        "{input.fasta_filename} {input.sample_dir} {params.primer3_exec_dir} {params.primer3_config_dir} {params.usearch_dir} "
         "-db {config[blast][16s_db]} "
         "-t {params.target_rank} "
         "-s {params.similarity}"

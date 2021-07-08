@@ -13,10 +13,10 @@ from dask.distributed import LocalCluster, Client
 # HiPR-FISH-strain : design probes
 ###############################################################################################################
 
-def design_probes(primer3_input_filename, primer3_settings_filename, probes_summary_dir):
+def design_probes(primer3_input_filename, primer3_settings_filename, primer3_exec_dir, probes_summary_dir):
     primer3_output_filename = re.sub('_primer3_input.txt', '_primer3_output.txt', primer3_input_filename)
     primer3_input_basename = re.sub('_primer3_input.txt', '', os.path.basename(primer3_input_filename))
-    return_code = subprocess.check_call(['/programs/primer3-2.3.5/src/primer3_core', '-p3_settings_file', primer3_settings_filename, '-output', primer3_output_filename, '-format_output', primer3_input_filename])
+    return_code = subprocess.check_call([primer3_exec_dir, '-p3_settings_file', primer3_settings_filename, '-output', primer3_output_filename, '-format_output', primer3_input_filename])
     probe_int_filename = '{}/{}.int'.format(probes_summary_dir, primer3_input_basename)
     probe_csv_filename = '{}/{}_probes.csv'.format(probes_summary_dir, primer3_input_basename)
     probes = pd.read_table(probe_int_filename, skiprows = 3, header = None, delim_whitespace = True)
@@ -33,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser('Blast FISH probes designed for a complex microbial community')
 
     parser.add_argument('primer3_dir', type = str, help = 'Input FASTA file containing full length 16S sequences of the complex microbial community')
+    parser.add_argument('primer3_exec_dir', type = str, help = 'Path to primer3 executable')
     parser.add_argument('-n_workers', '--n_workers', dest = 'n_workers', type = int, default = 20, help = 'Input FASTA file containing full length 16S sequences of the complex microbial community')
 
     args = parser.parse_args()
@@ -48,7 +49,7 @@ def main():
     client = Client(cluster)
     for i in range(len(index_list) - 1):
         primer3_input_filenames_sub = dd.from_pandas(primer3_input_filenames.iloc[index_list[i]:index_list[i+1],:], npartitions = 100)
-        probe_design = primer3_input_filenames_sub.primer3_input_filename.apply(design_probes, args = (primer3_settings_filename, probes_summary_dir,), meta = ('int'))
+        probe_design = primer3_input_filenames_sub.primer3_input_filename.apply(design_probes, args = (primer3_settings_filename, primer3_exec_dir, probes_summary_dir,), meta = ('int'))
         probe_design.compute()
     file = open(probe_design_complete_filename, 'w')
     file.write('Probe design is complete.')

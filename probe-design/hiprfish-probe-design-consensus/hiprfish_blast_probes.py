@@ -50,9 +50,9 @@ def main():
     blast_complete_filename = similarity_directory + '/primer3/' + taxon + '.probe.blast.complete.txt'
     if os.path.exists(blast_complete_filename):
         print(blast_complete_filename)
-        print('I am skipping blasting')
+        print('Skipping blasting since blast output file already exists.')
     else:
-        print('I am here doing blasting')
+        print('Blasting probes for taxon' + taxon)
         probe_blast_results = blast_taxon_probes(taxon_probe_directory, args.oriented_pacbio_filename)
         probe_blast_results.to_csv(similarity_directory + '/primer3/' + taxon + '_blast_return_code.csv')
         file = open(blast_complete_filename, 'w')

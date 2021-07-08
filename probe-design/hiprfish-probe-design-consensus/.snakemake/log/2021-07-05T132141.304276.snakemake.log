@@ -1,0 +1,130 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                                   count    min threads    max threads
+----------------------------------  -------  -------------  -------------
+add_spacers                               1              1              1
+all                                       1              1              1
+blast_probes                              1              1              1
+collect_probe_coverage_results            1              1              1
+collect_selected_probe_information        1              1              1
+combine_full_length_sequences             1              1              1
+design_probes                             1              1              1
+evaluate_taxon_probes                     1              1              1
+generate_full_probes                      1              1              1
+select_taxon_probes                       1              1              1
+total                                    10              1              1
+
+Select jobs to execute...
+
+[Mon Jul  5 13:21:42 2021]
+rule design_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/input/test_sample.fasta, /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/{*}_consensus.int (dynamic)
+    jobid: 8
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+Subsequent jobs will be added dynamically depending on the output of this job
+[Mon Jul  5 13:23:28 2021]
+Finished job 8.
+1 of 10 steps (10%) done
+Dynamically updating jobs
+Select jobs to execute...
+
+[Mon Jul  5 13:23:30 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/338.probe.blast.complete.txt
+    jobid: 19
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=338
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Mon Jul  5 13:23:30 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716.probe.blast.complete.txt
+    jobid: 47
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=1716
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Mon Jul  5 13:23:30 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/469_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/469.probe.blast.complete.txt
+    jobid: 43
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=469
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+
+[Mon Jul  5 13:23:30 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/434_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/434.probe.blast.complete.txt
+    jobid: 31
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=434
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+[Mon Jul  5 13:46:24 2021]
+Finished job 47.
+2 of 46 steps (4%) done
+Select jobs to execute...
+
+[Mon Jul  5 13:46:24 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1350_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1350.probe.blast.complete.txt
+    jobid: 35
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=1350
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+[Mon Jul  5 13:47:48 2021]
+Finished job 31.
+3 of 46 steps (7%) done
+Select jobs to execute...
+
+[Mon Jul  5 13:47:48 2021]
+rule blast_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842_consensus.int
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/2767842.probe.blast.complete.txt
+    jobid: 23
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=2767842
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+[Mon Jul  5 13:48:53 2021]
+Finished job 43.
+4 of 46 steps (9%) done
+Select jobs to execute...
+
+[Mon Jul  5 13:48:53 2021]
+rule evaluate_taxon_probes:
+    input: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716_consensus.int, /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716.probe.blast.complete.txt
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/blast/1716.probe.evaluation.complete.txt
+    jobid: 46
+    wildcards: sample=test_sample, target_rank=genus, similarity=0.1, taxon=1716
+    resources: tmpdir=/var/folders/gx/38cjbjvj1_gbld0y2r81xpzw0000gn/T
+
+[Mon Jul  5 13:49:00 2021]
+Error in rule evaluate_taxon_probes:
+    jobid: 46
+    output: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/blast/1716.probe.evaluation.complete.txt
+    shell:
+        python3 /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/hiprfish_evaluate_probes.py /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/primer3/1716_consensus.int -cdir /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/test_sample/genus/s_0.1/consensus
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Mon Jul  5 13:49:07 2021]
+Finished job 19.
+5 of 46 steps (11%) done
+[Mon Jul  5 14:10:03 2021]
+Finished job 35.
+6 of 46 steps (13%) done
+[Mon Jul  5 14:11:18 2021]
+Finished job 23.
+7 of 46 steps (15%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus/.snakemake/log/2021-07-05T132141.304276.snakemake.log

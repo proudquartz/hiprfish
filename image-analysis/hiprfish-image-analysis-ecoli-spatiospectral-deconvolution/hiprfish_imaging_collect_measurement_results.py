@@ -31,6 +31,7 @@ def collect_deconvolution_results(data_folder, image_tab_filename, theme_color):
     image_tab = pd.read_csv(image_tab_filename)
     cell_merger_counts_list = []
     cell_merger_correct_separation_list = []
+    eparation_list = []
     cell_merger_hamming_counts_list = []
     cell_merger_hamming_correct_separation_list = []
     for csm in np.arange(0.2,1.6,0.2):
@@ -91,6 +92,7 @@ def collect_deconvolution_results(data_folder, image_tab_filename, theme_color):
     plt.xticks(np.arange(0, 11, 2))
     plt.subplots_adjust(left = 0.2, bottom = 0.22, right = 0.98, top = 0.98)
     plt.savefig('{}/ecoli_1023_mix_barcode_neighbor_hamming.pdf'.format(data_folder), dpi = 300, transparent = True)
+    plt.close()
     # barcode neighbor hamming presentation
     theme_color = 'white'
     font_size = 12

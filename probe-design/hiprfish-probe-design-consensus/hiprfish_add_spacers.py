@@ -9,7 +9,6 @@ import subprocess
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC, generic_dna
 from Bio.Blast.Applications import NcbiblastnCommandline
 from matplotlib import pyplot as plt
 
@@ -25,7 +24,7 @@ def add_spacer(taxon_best_probes, output_filename, consensus_directory):
     probes = pd.read_csv(taxon_best_probes)
     probes['seqrcsa'] = ''
     for i in range(0, probes.shape[0]):
-        probe_seq = Seq(probes['seq'][i], generic_dna)
+        probe_seq = Seq(probes['seq'][i])
         rrna_file = consensus_directory + '/' + str(probes['target_taxon'][i]) + '.consensus.fasta'
         rrna_file_length = sum(1 for record in SeqIO.parse(rrna_file, 'fasta'))
         if rrna_file_length > 1:

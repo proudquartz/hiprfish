@@ -13,7 +13,6 @@ from SetCoverPy import setcover
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC, generic_dna
 from Bio.Blast.Applications import NcbiblastnCommandline
 from joblib import Parallel, delayed
 
@@ -51,10 +50,10 @@ def blast_pacbio(input_data_filename, blast_database_name, output_data_filename,
     return
 
 # generate consensus sequence based on OTU
-def generate_consensus_otu(input_blast_filename, input_fasta_filename, similarity, outdir):
+def generate_consensus_otu(input_blast_filename, input_fasta_filename, similarity, outdir, usearch_dir):
     # read in blast result
 
-    blast_result = pd.read_table(input_blast_filename, header = None, dtype = {13:str})
+    blast_result = pd.read_csv(input_blast_filename, header = None, dtype = {13:str}, sep = '\t')
     blast_result.columns = ['molecule_id', 'reference_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'staxids']
 
     # initiate an instance of ncbi taxonomy database
@@ -78,11 +77,11 @@ def generate_consensus_otu(input_blast_filename, input_fasta_filename, similarit
     taxon = os.path.basename(input_fasta_filename).replace('.fasta', '')
     taxon_consensus_filename = outdir + '/' + taxon + '.consensus.fasta'
     taxon_sequence_cluster_info_filename = outdir + '/' + taxon + '.uc'
-    subprocess.check_call(['/home/hs673/Tools/usearch', '-cluster_fast', input_fasta_filename, '-id', str(similarity), '-consout', taxon_consensus_filename, '-uc', taxon_sequence_cluster_info_filename])
+    subprocess.check_call([usearch_dir, '-cluster_fast', input_fasta_filename, '-id', str(similarity), '-consout', taxon_consensus_filename, '-uc', taxon_sequence_cluster_info_filename])
     return
 
 # group fasta sequences by taxon and write to file
-def write_taxon_fasta(df, taxon, seq_dict, similarity, outdir):
+def write_taxon_fasta(df, taxon, seq_dict, similarity, outdir, usearch_dir):
     # specify file names
     if taxon == 'strain':
         taxon = 'species'
@@ -98,7 +97,7 @@ def write_taxon_fasta(df, taxon, seq_dict, similarity, outdir):
     # write taxon specific sequences to file
     SeqIO.write(taxon_seqs, taxon_fasta_filename, 'fasta')
     if len(taxon_seqs) > 1:
-        subprocess.check_call(['/home/hs673/Tools/usearch', '-cluster_fast', taxon_fasta_filename, '-id', str(similarity), '-consout', taxon_consensus_filename, '-uc', taxon_sequence_cluster_info_filename])
+        subprocess.check_call([usearch_dir, '-cluster_fast', taxon_fasta_filename, '-id', str(similarity), '-consout', taxon_consensus_filename, '-uc', taxon_sequence_cluster_info_filename])
     else:
         consensus_seq = taxon_seqs[0].seq
         seq_rec = SeqRecord(consensus_seq, id = taxon_name, description = '')
@@ -108,7 +107,7 @@ def write_taxon_fasta(df, taxon, seq_dict, similarity, outdir):
 # write oriented pacbio fasta file
 def write_oriented_pacbio_fasta(input_fasta_filename, input_blast_filename, oriented_fasta_filename):
     seq_dict = SeqIO.to_dict(SeqIO.parse(input_fasta_filename, 'fasta'))
-    blast_result = pd.read_table(input_blast_filename, header = None)
+    blast_result = pd.read_csv(input_blast_filename, header = None, sep = '\t')
     blast_result.columns = ['molecule_id', 'reference_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'staxids']
     blast_result['oriented'] = (blast_result['sstart'] < blast_result['send'])
     oriented_seqs = [seq_dict[mid] if blast_result[blast_result['molecule_id'] == mid]['oriented'].values else SeqRecord(seq_dict[mid].reverse_complement().seq, id = mid, description = '') for mid in blast_result['molecule_id']]
@@ -121,7 +120,7 @@ def make_blast_db(input_fasta_file):
     return
 
 def generate_blast_lineage(input_blast_filename, similarity, outdir, target_rank):
-    blast_result = pd.read_table(input_blast_filename, header = None, dtype = {13: str})
+    blast_result = pd.read_csv(input_blast_filename, header = None, dtype = {13: str}, sep = '\t')
     blast_result.columns = ['molecule_id', 'reference_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'staxids']
     ncbi = NCBITaxa()
 
@@ -152,10 +151,10 @@ def generate_blast_lineage(input_blast_filename, similarity, outdir, target_rank
     return
 
 # generate consensus sequence
-def generate_consensus(input_fasta_filename, input_blast_filename, similarity, outdir, target_rank):
+def generate_consensus(input_fasta_filename, input_blast_filename, similarity, outdir, target_rank, usearch_dir):
     # read in blast result
 
-    blast_result = pd.read_table(input_blast_filename, header = None, dtype = {13: str})
+    blast_result = pd.read_csv(input_blast_filename, header = None, dtype = {13: str}, sep = '\t')
     blast_result.columns = ['molecule_id', 'reference_id', 'pid', 'qcovhsp', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'staxids']
 
     # initiate an instance of ncbi taxonomy database
@@ -176,9 +175,9 @@ def generate_consensus(input_fasta_filename, input_blast_filename, similarity, o
     blast_lineage = blast_result.merge(ranks, on = 'staxids', how = 'left')
     seq_dict = SeqIO.to_dict(SeqIO.parse(input_fasta_filename, 'fasta'))
     if target_rank == 'strain':
-        blast_lineage.groupby(['species']).apply(write_taxon_fasta, taxon = target_rank, seq_dict = seq_dict, similarity = similarity, outdir = outdir)
+        blast_lineage.groupby(['species']).apply(write_taxon_fasta, taxon = target_rank, seq_dict = seq_dict, similarity = similarity, outdir = outdir, usearch_dir = usearch_dir)
     else:
-        blast_lineage.groupby([target_rank]).apply(write_taxon_fasta, taxon = target_rank, seq_dict = seq_dict, similarity = similarity, outdir = outdir)
+        blast_lineage.groupby([target_rank]).apply(write_taxon_fasta, taxon = target_rank, seq_dict = seq_dict, similarity = similarity, outdir = outdir, usearch_dir = usearch_dir)
     return(blast_lineage)
 
 # combine taxon consensus fasta files
@@ -210,7 +209,7 @@ def combine_fasta_files(input_file_directory, file_ext, output_file_name):
     return
 
 # probe design
-def probe_design(input_fasta_filename, outdir, target_rank, min_tm, include_start, include_end):
+def probe_design(input_fasta_filename, outdir, primer3_exec_dir, primer3_config_dir, target_rank, min_tm, include_start, include_end):
 
     # running the function
     settings_file_path = outdir + '/primer3_settings.txt'
@@ -244,11 +243,14 @@ def probe_design(input_fasta_filename, outdir, target_rank, min_tm, include_star
                         'PRIMER_INTERNAL_MAX_NS_ACCEPTED=0',
                         'PRIMER_THERMODYNAMIC_OLIGO_ALIGNMENT=1',
                         'PRIMER_THERMODYNAMIC_TEMPLATE_ALIGNMENT=0',
-                        'PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/programs/primer3-2.3.5/src/primer3_config/',
+                        f'PRIMER_THERMODYNAMIC_PARAMETERS_PATH={primer3_config_dir}',
                         'PRIMER_LOWERCASE_MASKING=0',
                         'PRIMER_PICK_ANYWAY=1',
                         '=']
-    pd.DataFrame(primer3_settings).to_csv(settings_file_path, header = None, index = False)
+    with open(settings_file_path, 'w') as f:
+        for lm in primer3_settings:
+            f.write(f'{lm}\n')
+    # pd.DataFrame(primer3_settings).to_csv(settings_file_path, header = None, index = False)
 
     # write primer3 input file
     conseq = SeqIO.parse(input_fasta_filename, 'fasta')
@@ -261,7 +263,7 @@ def probe_design(input_fasta_filename, outdir, target_rank, min_tm, include_star
         print('No probe design was rerun')
     else:
         print('Probe design was run')
-        subprocess.check_call(['/programs/primer3-2.3.5/src/primer3_core', '-p3_settings_file', settings_file_path, '-output', output_file_path, '-format_output', primer3_input_file_path])
+        subprocess.check_call([primer3_exec_dir, '-p3_settings_file', settings_file_path, '-output', output_file_path, '-format_output', primer3_input_file_path])
 
     return
 
@@ -271,7 +273,7 @@ def split_taxon_probe_file(probe_filename):
     taxon_probe_directory = probe_dir + '/' + taxon
     if not os.path.exists(taxon_probe_directory):
         os.makedirs(taxon_probe_directory)
-    probes = pd.read_table(probe_filename, skiprows = 3, header = None, delim_whitespace = True)
+    probes = pd.read_csv(probe_filename, skiprows = 3, header = None, delim_whitespace = True)
     probes.columns = ['probe_num', 'seq', 'start', 'length', 'N', 'GC', 'Tm', 'self_any_th', 'self_end_th', 'hair-pin', 'quality']
     probes_list = [SeqRecord(Seq(probes['seq'][i]).reverse_complement(), id = str(probes['probe_num'][i]), description = '') for i in range (0, probes.shape[0])]
     probes_fasta_filenames = [probe_dir + '/' + taxon + '/' + taxon_consensus_filename + '.probe_' + str(probe_num) + '.fasta' for probe_num in range(probes.shape[0])]
@@ -284,11 +286,11 @@ def split_taxon_probe_file(probe_filename):
 
 def retrieve_cluster(input_blast_lineage, input_consensus_directory, otu):
     if otu == 'F':
-        blast_lineage_df = pd.read_table(input_blast_lineage, dtype = {'staxids':str})
+        blast_lineage_df = pd.read_csv(input_blast_lineage, dtype = {'staxids':str}, sep = '\t')
         lineage_columns = ['molecule_id', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species']
         blast_lineage_slim = blast_lineage_df[lineage_columns]
     else:
-        blast_lineage_df = pd.read_table(input_blast_lineage, dtype = {'staxids':str}, header = None)
+        blast_lineage_df = pd.read_csv(input_blast_lineage, dtype = {'staxids':str}, header = None, sep = '\t')
         blast_lineage_df.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
         blast_lineage_filtered = blast_lineage_df[blast_lineage_df['rec_type'] != 'C']
         blast_lineage_filtered['target_taxon'] = 'Cluster' + blast_lineage_filtered['cluster_num'].astype(str)
@@ -316,7 +318,7 @@ def retrieve_cluster(input_blast_lineage, input_consensus_directory, otu):
             cluster_lookup = pd.concat([cluster_lookup, molecule_cluster], ignore_index = True)
         else:
             taxon_uc_file = input_consensus_directory + '/' + str(taxon) + '.uc'
-            taxon_uc = pd.read_table(taxon_uc_file, header = None)
+            taxon_uc = pd.read_csv(taxon_uc_file, header = None, sep = '\t')
             taxon_uc.columns = ['rec_type', 'cluster_num', 'seq_length', 'pid', 'strand', 'notused', 'notused', 'comp_alignment', 'query_label', 'target_label']
             taxon_uc_clusters = taxon_uc[(taxon_uc['rec_type'] == 'S') | (taxon_uc['rec_type'] == 'H')]
             molecule_cluster = pd.DataFrame([[taxon_uc_clusters.loc[i, 'query_label'], str(taxon) + '_Cluster' + str(taxon_uc_clusters.loc[i, 'cluster_num'])] for i in range(0, taxon_uc_clusters.shape[0])])
@@ -347,6 +349,15 @@ def main():
 
     # output directory
     parser.add_argument('output_directory', type = str, help = 'Directory to save all the outputs of the probe design pipeline')
+
+    # path to primer3 executable
+    parser.add_argument('primer3_exec_dir', type = str, help = 'Directory to primer3 executable')
+
+    # path to primer3 config directory
+    parser.add_argument('primer3_config_dir', type = str, help = 'Directory to primer3 config directory')
+
+    # path to usearch executable
+    parser.add_argument('usearch_dir', type = str, help = 'Directory to usearch executable')
 
     # 16S database
     parser.add_argument('-db', '--blast_database', dest = 'blast_database', type = str, default = '', help = '16S database to identify the taxonomic lineage of each 16S sequence')
@@ -407,13 +418,13 @@ def main():
         taxon_consensus_output_directory = sim_dir + '/consensus'
         if not os.path.exists(taxon_consensus_output_directory):
             os.makedirs(taxon_consensus_output_directory)
-        generate_consensus(args.input_file_name, pacbio_blast_output_file_name, args.similarity, taxon_consensus_output_directory, args.target_rank)
+        generate_consensus(args.input_file_name, pacbio_blast_output_file_name, args.similarity, taxon_consensus_output_directory, args.target_rank, args.usearch_dir)
     else:
         # generate consensus 16S sequence for each OTU
         taxon_consensus_output_directory = sim_dir + '/consensus/'
         if not os.path.exists(taxon_consensus_output_directory):
             os.makedirs(taxon_consensus_output_directory)
-        generate_consensus_otu(args.special_blast_database, pacbio_blast_output_file_name, args.input_file_name, args.similarity, taxon_consensus_output_directory)
+        generate_consensus_otu(args.special_blast_database, pacbio_blast_output_file_name, args.input_file_name, args.similarity, taxon_consensus_output_directory, args.usearch_dir)
 
     blast_lineage_output_dir = args.output_directory + '/{}/s_{}/consensus/'.format(args.target_rank, args.similarity)
     if not os.path.exists(blast_lineage_output_dir):
@@ -429,11 +440,11 @@ def main():
         pass
     if args.otu == 'F':
         combine_fasta_files(taxon_consensus_output_directory, consensus_fasta_ext, taxon_consensus_sequences_filename)
-        probe_design(taxon_consensus_sequences_filename, taxon_probes_output_directory, args.target_rank, args.min_tm, args.include_start, args.include_end)
+        probe_design(taxon_consensus_sequences_filename, taxon_probes_output_directory, args.primer3_exec_dir, args.primer3_config_dir, args.target_rank, args.min_tm, args.include_start, args.include_end)
     else:
         taxon = os.path.basename(args.input_file_name).replace('.fasta', '')
         taxon_consensus_sequences_filename = sim_dir + '/consensus/' + taxon + '.consensus.fasta'
-        probe_design(taxon_consensus_sequences_filename, taxon_probes_output_directory, args.target_rank, args.min_tm, args.include_start, args.include_end)
+        probe_design(taxon_consensus_sequences_filename, taxon_probes_output_directory, args.primer3_exec_dir, args.primer3_config_dir, args.target_rank, args.min_tm, args.include_start, args.include_end)
     taxon_probes_filename = glob.glob(taxon_probes_output_directory + '*_consensus.int')
     for filename in taxon_probes_filename:
         split_taxon_probe_file(filename)

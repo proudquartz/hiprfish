@@ -1,0 +1,1 @@
+probe_id,molecule_id,pid,qcovhsp,length,mismatch,gapopen,probe_start,probe_end,molecule_start,molecule_end,evalue,bitscore,staxids,qseq,sseq,mch,superkingdom,phylum,class,order,family,genus,species,strain,max_average_encoding_interference_fraction_0bp,max_average_encoding_interference_fraction_5bp,max_average_encoding_interference_fraction_10bp

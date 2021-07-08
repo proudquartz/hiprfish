@@ -8,6 +8,11 @@
     {
         "16s_db" : "/home/hs673/Resources/16SMicrobial/16SMicrobial",
     },
+    "primer3":
+    {
+        "primer3_exec_dir" : "primer3_core",
+        "primer3_config_dir" : "/Users/hao/miniconda3/envs/hiprfish/lib/python3.8/site-packages/primer3/src/libprimer3/primer3_config"
+    },
     "simulations" :
     {
         "simulation_table" : "/workdir/hs673/Runs/V1/Samples/HIPRFISH_3/simulation_table_57.csv"
