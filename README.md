@@ -31,15 +31,16 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
      `conda activate hiprfish`\
      `conda install pandas`\
      `conda install -c bioconda primer3 -y`\
+     `conda install -c anaconda scipy -y`\
      `conda install -c anaconda joblib -y`\
      `conda install -c anaconda biopython -y`\
      `conda install -c etetoolkit ete3 ete_toolchain -y`\
      `conda install -n hiprfish -c conda-forge mamba -y`\
-     `mamba install -c conda-forge -c bioconda snakemake -y`
-     `pip install SetCoverPy`
-     `pip install tables`
-     `pip install openpyxl`
-     `pip install matplotlib`
+     `mamba install -c conda-forge -c bioconda snakemake -y`\
+     `pip install SetCoverPy`\
+     `pip install tables`\
+     `pip install openpyxl`\
+     `pip install matplotlib`\
      
 3. Install usearch. [Download](https://www.drive5.com/usearch/download.html) usearch executable. Move the downloaded file to a directory of your choosing. 
      
