@@ -46,6 +46,8 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
      
 4. Install blast. [Download](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) the latest version and install the downloaded package. 
 
+5. [Download](https://ftp.ncbi.nlm.nih.gov/blast/db/) a copy of the NCBI 16S rRNA database.
+
 6. Edit the `hiprfish_config.json file` to point the pipeline to the correct directories.
    - `__default__`
       * `SCRIPTS_PATH`: path to the folder that contains all the scripts
