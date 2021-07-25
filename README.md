@@ -27,15 +27,14 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
 ### Before running the pipeline
 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html),
 2. Install the environment by running the following commands:
-     `conda create -n hiprfish python=3.6`\
+     `conda create -n hiprfish python=3.8`\
      `conda activate hiprfish`\
      `conda install pandas`\
      `conda install -c bioconda primer3 -y`\
      `conda install -c anaconda joblib -y`\
      `conda install -c anaconda biopython -y`\
-     `conda install -c etetoolkit ete3 ete_toolchain -y`\
-     `conda install -n hiprfish -c conda-forge mamba -y`\
-     `mamba install -c conda-forge -c bioconda snakemake -y`\
+     `pip install snakemake`\
+     `pip install ete3`\
      `pip install SetCoverPy`\
      `pip install tables`\
      `pip install openpyxl`\
