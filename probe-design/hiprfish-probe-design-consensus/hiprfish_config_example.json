@@ -1,24 +1,24 @@
 {
     "__default__" :
     {
-        "SCRIPTS_PATH" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/hiprfish-probe-design-consensus",
-        "DATA_DIR" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example",
+        "SCRIPTS_PATH" : "/home/ec2-user/workflows/hiprfish/probe-design/hiprfish-probe-design-consensus",
+        "DATA_DIR" : "/home/ec2-user/workflows/hiprfish/probe-design/example",
     },
     "blast":
     {
-        "16s_db" : "/Users/hao/Documents/Resources/16S_ribosomal_RNA/16S_ribosomal_RNA",
+        "16s_db" : "/home/ec2-user/resources/16S_ribosomal_RNA/16S_ribosomal_RNA",
     },
     "primer3":
     {
         "primer3_exec_dir" : "primer3_core",
-        "primer3_config_dir" : "/Users/hao/miniconda3/envs/hiprfish/lib/python3.6/site-packages/primer3_config"
+        "primer3_config_dir" : "/home/ec2-user/miniconda3/envs/hiprfish_test/lib/python3.89/site-packages/primer3_config"
     },
     "usearch":
     {
-        "usearch_dir" : "/Users/hao/Documents/Resources/usearch"
+        "usearch_dir" : "/home/ec2-user/workflows/resources/usearch"
     },
     "simulations" :
     {
-        "simulation_table" : "/Users/hao/Documents/Research/Cornell/Scripts/hiprfish/probe-design/example/simulation_table_example.csv"
+        "simulation_table" : "/home/ec2-user/workflows/hiprfish/probe-design/example/simulation_table_example.csv"
     }
 }
