@@ -525,7 +525,7 @@ def generate_probe_statistics_plots(design_dir, probes_final_filter, primerset, 
     plt.close()
     off_target_filenames = glob.glob('{}/*_off_target_summary_info.csv'.format(design_dir))
     off_target_filenames.sort()
-    taxid_list = probes_final_filter.target_taxon.drop_duplicates().astype(str).values
+    taxid_list = probes_final_filter.target_taxon.drop_duplicates().astype(int).values
     taxid_list.sort()
     ot_gc = pd.DataFrame(np.zeros((taxid_list.shape[0], taxid_list.shape[0])))
     ot_gc.columns = taxid_list
@@ -535,7 +535,7 @@ def generate_probe_statistics_plots(design_dir, probes_final_filter, primerset, 
         ot['OTGC'] = ot.qseq.apply(GC)
         ot['OTGCINT'] = ot.OTGC.values*ot.length.values
         ot_gc_temp = ot.groupby(target_rank).agg({'OTGCINT': 'max'}).reset_index().sort_values(by = target_rank, ascending = True)
-        ot_gc.loc[ot_gc_temp.loc[:,target_rank].values,taxid_list[i]] = ot_gc_temp.OTGCINT.values/100
+        ot_gc.loc[ot_gc_temp.loc[:,target_rank].values.astype(int),taxid_list[i]] = ot_gc_temp.OTGCINT.values/100
     fig = plt.figure()
     fig.set_size_inches(cm_to_inches(8), cm_to_inches(7))
     plt.imshow(ot_gc.values, cmap = 'inferno')
