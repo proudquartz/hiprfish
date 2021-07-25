@@ -15,7 +15,7 @@
     },
     "usearch":
     {
-        "usearch_dir" : "/home/ec2-user/workflows/resources/usearch"
+        "usearch_dir" : "/home/ec2-user/resources/usearch"
     },
     "simulations" :
     {
