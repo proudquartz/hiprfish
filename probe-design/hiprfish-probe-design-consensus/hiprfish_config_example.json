@@ -11,7 +11,7 @@
     "primer3":
     {
         "primer3_exec_dir" : "primer3_core",
-        "primer3_config_dir" : "/home/ec2-user/miniconda3/envs/hiprfish_test/lib/python3.89/site-packages/primer3_config"
+        "primer3_config_dir" : "/home/ec2-user/miniconda3/envs/hiprfish_test/lib/python3.8/site-packages/primer3_config"
     },
     "usearch":
     {
