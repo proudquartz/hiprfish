@@ -39,7 +39,7 @@ def get_cumulative_coverage(taxon_best_probes, taxon_best_probes_filtered):
     n_total = taxon_best_probes.loc[:,['target_taxon_full','taxon_abundance']].drop_duplicates().taxon_abundance.sum()
     taxon_best_probes['taxon_coverage_absolute'] = taxon_best_probes.taxon_coverage.values*taxon_best_probes.taxon_abundance.values
     taxon_best_probes_sorted = taxon_best_probes.sort_values(['taxon_coverage_absolute'], ascending = False)
-    taxon_best_probes_sorted_filtered = pd.merge(taxon_best_probes_filtered.ix[:,['target_taxon_full']], taxon_best_probes, how = 'left', on = 'target_taxon_full')
+    taxon_best_probes_sorted_filtered = pd.merge(taxon_best_probes_filtered.loc[:,['target_taxon_full']], taxon_best_probes, how = 'left', on = 'target_taxon_full')
     taxon_best_probes_sorted_filtered.sort_values(['taxon_coverage_absolute'], ascending = False, inplace = True)
     taxon_cumsum = taxon_best_probes_sorted_filtered[['target_taxon', 'taxon_coverage_absolute']].drop_duplicates().taxon_coverage_absolute.cumsum()
     cumcov = taxon_cumsum.values/n_total

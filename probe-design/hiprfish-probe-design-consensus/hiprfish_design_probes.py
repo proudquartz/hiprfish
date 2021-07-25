@@ -66,7 +66,7 @@ def generate_consensus_otu(input_blast_filename, input_fasta_filename, similarit
     ranks['staxids'] = blast_result_staxids
     for i in range(0, blast_result_staxids.shape[0]):
         taxid = blast_result_staxids[i]
-        ranks.ix[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
+        ranks.iloc[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
 
     # merge lineage information with PacBio 16S blast results
     blast_lineage = blast_result.merge(ranks, on = 'staxids', how = 'left')
@@ -133,7 +133,7 @@ def generate_blast_lineage(input_blast_filename, similarity, outdir, target_rank
         taxid = blast_result_staxids[i]
         if not str(taxid).isdigit():
             taxid = taxid.split(';')[0]
-        ranks.ix[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
+        ranks.iloc[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
     blast_lineage = blast_result.merge(ranks, on = 'staxids', how = 'left')
     blast_lineage['molecule_id'] = blast_lineage['molecule_id'].apply(sub_slash)
     blast_lineage_filename = outdir + '/blast_lineage.tab'
@@ -169,7 +169,7 @@ def generate_consensus(input_fasta_filename, input_blast_filename, similarity, o
         taxid = blast_result_staxids[i]
         if not str(taxid).isdigit():
             taxid = taxid.split(';')[0]
-        ranks.ix[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
+        ranks.iloc[i,1:len(desired_ranks)+1] = get_lineage_at_desired_ranks(taxid, desired_ranks)
 
     # merge lineage information with PacBio 16S blast results
     blast_lineage = blast_result.merge(ranks, on = 'staxids', how = 'left')

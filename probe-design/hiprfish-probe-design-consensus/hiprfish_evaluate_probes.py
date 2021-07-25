@@ -72,7 +72,7 @@ def mch_test_v4(df, blast_output_filename):
             num_line = subprocess.call(['wc', '-l', blast_output_filename])
             print(num_line)
             print(blast_output_filename)
-            print(df.ix[i,:])
+            print(df.iloc[i,:])
     return(mch_array)
 
 def sub_slash(str):

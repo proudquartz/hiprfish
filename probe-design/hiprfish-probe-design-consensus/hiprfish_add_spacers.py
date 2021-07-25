@@ -38,7 +38,7 @@ def add_spacer(taxon_best_probes, output_filename, consensus_directory):
         right_spacer = rrna_seq[sstart - 2] + rrna_seq[sstart - 3] + rrna_seq[sstart - 4]
         left_spacer = rrna_seq[send + 2] + rrna_seq[send + 1] + rrna_seq[send]
         probe_seq_rcsa = str(left_spacer).upper() + str(probe_seq.reverse_complement()) + str(right_spacer).upper()
-        probes.ix[i, 'seqrcsa'] = probe_seq_rcsa
+        probes.loc[i, 'seqrcsa'] = probe_seq_rcsa
     probes.loc[:,'quadg'] = (probes['seqrcsa'].str.upper().str.count('GGGG')) + (probes['seqrcsa'].str.upper().str.count('GGGGG'))
     probes = probes.loc[probes['quadg'] == 0, :]
     probes.to_csv(output_filename, index = False)
