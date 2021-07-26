@@ -55,7 +55,7 @@ The pipeline requires a local copy of the 16SMicrobial database from NCBI.
       * `16s_db`: path to the local copy of NCBI 16SMicrobial database. If you put the database files in `/[PATH_TO_16S_DB]/16S_ribosoma_RNA` (i.e. the path name to the full database files look like `/[PATH_TO_16S_DB]/16S_ribosoma_RNA/16S_ribosoma_RNA.n*`), you should set the value of this variable to `/[PATH_TO_16S_DB]/16S_ribosoma_RNA/16S_ribosoma_RNA`.
    -  `primer3`
       * `primer3_exec_dir`: path to the primer3 executable. If you installed primer3 via conda, you can likely just put "primer3_core" here. If that alias somehow does not work, you can put the full path to the primer3_core executable instead.
-      * `primer3_config_dir`: configuration files for primer3. You can [download](https://github.com/primer3-org/primer3) the source repository and copy the primer3_config folder to a location your choosing on your local system.
+      * `primer3_config_dir`: configuration files for primer3. You can [download](https://github.com/primer3-org/primer3) the source repository and copy the primer3_config folder to a location of your choosing on your local system.
    -  `usearch`
       * `usearch_dir`: path to the usearch executable
    - `simulations`
